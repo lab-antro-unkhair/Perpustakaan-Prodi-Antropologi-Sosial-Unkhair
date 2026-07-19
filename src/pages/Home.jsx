@@ -1,4 +1,8 @@
+import { useNavigate } from 'react-router-dom'
+
 function Home() {
+  const navigate = useNavigate()
+
   return (
     <div className="max-w-6xl mx-auto px-6 py-12">
       <div className="text-center mb-12">
@@ -11,17 +15,28 @@ function Home() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white rounded-xl shadow p-6 text-center">
+        <div
+          onClick={() => navigate('/katalog')}
+          className="bg-white rounded-xl shadow p-6 text-center cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all"
+        >
           <div className="text-4xl mb-3">📚</div>
           <h3 className="font-bold text-lg text-blue-800 mb-1">Katalog Buku</h3>
           <p className="text-gray-500 text-sm">Cari dan temukan buku yang tersedia</p>
         </div>
-        <div className="bg-white rounded-xl shadow p-6 text-center">
+
+        <div
+          onClick={() => navigate('/peminjaman')}
+          className="bg-white rounded-xl shadow p-6 text-center cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all"
+        >
           <div className="text-4xl mb-3">📋</div>
           <h3 className="font-bold text-lg text-blue-800 mb-1">Peminjaman</h3>
           <p className="text-gray-500 text-sm">Kelola peminjaman dan pengembalian buku</p>
         </div>
-        <div className="bg-white rounded-xl shadow p-6 text-center">
+
+        <div
+          onClick={() => navigate('/anggota')}
+          className="bg-white rounded-xl shadow p-6 text-center cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all"
+        >
           <div className="text-4xl mb-3">👤</div>
           <h3 className="font-bold text-lg text-blue-800 mb-1">Anggota</h3>
           <p className="text-gray-500 text-sm">Manajemen data anggota perpustakaan</p>

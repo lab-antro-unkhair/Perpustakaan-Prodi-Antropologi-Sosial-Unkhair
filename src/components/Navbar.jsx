@@ -35,6 +35,7 @@ function Navbar() {
           <Link to="/peminjaman" className="hover:text-yellow-300">Peminjaman</Link>
           {user ? (
             <>
+            <Link to="/anggota" className="hover:text-yellow-300">Anggota</Link>
               <Link to="/admin/buku" className="hover:text-yellow-300">Admin</Link>
               <button
                 onClick={handleLogout}
