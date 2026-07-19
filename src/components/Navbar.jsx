@@ -33,7 +33,19 @@ function Navbar() {
           <Link to="/" className="hover:text-yellow-300">Beranda</Link>
           <Link to="/katalog" className="hover:text-yellow-300">Katalog</Link>
           <Link to="/peminjaman" className="hover:text-yellow-300">Peminjaman</Link>
-          {user ? (
+          {user ? ({user ? (
+  <>
+    <Link to="/admin/buku" className="hover:text-yellow-300">Admin</Link>
+    <button
+      onClick={handleLogout}
+      className="bg-red-500 hover:bg-red-600 px-3 py-1 rounded-lg text-white text-sm transition"
+    >
+      Logout
+    </button>
+  </>
+) : (
+  <Link to="/login" className="hover:text-yellow-300">Login</Link>
+)}
             <button
               onClick={handleLogout}
               className="bg-red-500 hover:bg-red-600 px-3 py-1 rounded-lg text-white text-sm transition"
