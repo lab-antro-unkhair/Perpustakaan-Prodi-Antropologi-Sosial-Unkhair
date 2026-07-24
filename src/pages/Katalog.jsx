@@ -71,8 +71,15 @@ function Katalog() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {dataBuku.length > 0 ? dataBuku.map((buku) => (
             <div key={buku.id} className="bg-white rounded-xl shadow p-5">
-              <div className="text-3xl mb-3">📖</div>
-              <h3 className="font-bold text-blue-800 mb-1">{buku.judul}</h3>
+  {buku.cover_url ? (
+    <img src={buku.cover_url} alt={buku.judul}
+      className="w-full h-48 object-cover rounded-lg mb-3" />
+  ) : (
+    <div className="w-full h-48 bg-gray-100 rounded-lg mb-3 flex items-center justify-center text-4xl">
+      📖
+    </div>
+  )}
+  <h3 className="font-bold text-blue-800 mb-1">{buku.judul}</h3>
               <p className="text-gray-500 text-sm mb-1">{buku.pengarang}</p>
               <p className="text-gray-400 text-xs mb-3">{buku.penerbit}</p>
               <span className={`px-2 py-1 rounded-full text-xs font-medium ${
