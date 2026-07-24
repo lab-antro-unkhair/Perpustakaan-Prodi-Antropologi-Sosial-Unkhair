@@ -10,6 +10,7 @@ function AdminBuku() {
   const [editId, setEditId] = useState(null)
   const [editForm, setEditForm] = useState({})
   const [form, setForm] = useState({ no_induk: '', judul: '', pengarang: '', penerbit: '', stok: 1 })
+  const [coverFile, setCoverFile] = useState(null)
   const scrollRef = useRef(0)
   const navigate = useNavigate()
 
@@ -52,10 +53,30 @@ function AdminBuku() {
     fetchBuku()
   }
 
+  async function handleUploadCover(file, bukuId) {
+    const fileExt = file.name.split('.').pop()
+    const fileName = `${bukuId}.${fileExt}`
+    const { error } = await supabase.storage
+      .from('covers')
+      .upload(fileName, file, { upsert: true })
+    if (error) {
+      alert('Gagal upload foto!')
+      return null
+    }
+    const { data } = supabase.storage.from('covers').getPublicUrl(fileName)
+    return data.publicUrl
+  }
+
   async function handleSimpanEdit(id) {
     if (!editForm.judul || !editForm.pengarang) return alert('Judul dan pengarang wajib diisi!')
-    await supabase.from('buku').update(editForm).eq('id', id)
+    let updatedForm = { ...editForm }
+    if (coverFile) {
+      const url = await handleUploadCover(coverFile, id)
+      if (url) updatedForm.cover_url = url
+    }
+    await supabase.from('buku').update(updatedForm).eq('id', id)
     setEditId(null)
+    setCoverFile(null)
     fetchBuku()
   }
 
@@ -67,7 +88,7 @@ function AdminBuku() {
 
   function handleEdit(buku) {
     setEditId(buku.id)
-    setEditForm({ no_induk: buku.no_induk, judul: buku.judul, pengarang: buku.pengarang, penerbit: buku.penerbit, stok: buku.stok })
+    setEditForm({ no_induk: buku.no_induk, judul: buku.judul, pengarang: buku.pengarang, penerbit: buku.penerbit, stok: buku.stok, cover_url: buku.cover_url })
   }
 
   const filtered = bukuList.filter(b =>
@@ -198,6 +219,15 @@ function AdminBuku() {
                           <input type="number" value={editForm.stok}
                             onChange={e => setEditForm({ ...editForm, stok: parseInt(e.target.value) })}
                             className="w-full border border-blue-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                        </div>
+                        <div>
+                          <label className="text-xs text-gray-500 mb-1 block">Cover Buku</label>
+                          {editForm.cover_url && (
+                            <img src={editForm.cover_url} alt="cover" className="w-16 h-20 object-cover rounded mb-2" />
+                          )}
+                          <input type="file" accept="image/*"
+                            onChange={e => setCoverFile(e.target.files[0])}
+                            className="w-full text-sm text-gray-500 file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200" />
                         </div>
                       </div>
                       <div className="flex gap-3 mt-3">
