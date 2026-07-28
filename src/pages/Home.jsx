@@ -14,7 +14,7 @@ function Home() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div
           onClick={() => navigate('/katalog')}
           className="bg-white rounded-xl shadow p-6 text-center cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all"
@@ -22,6 +22,15 @@ function Home() {
           <div className="text-4xl mb-3">📚</div>
           <h3 className="font-bold text-lg text-blue-800 mb-1">Katalog Buku</h3>
           <p className="text-gray-500 text-sm">Cari dan temukan buku yang tersedia</p>
+        </div>
+
+        <div
+          onClick={() => navigate('/skripsi-jurnal')}
+          className="bg-white rounded-xl shadow p-6 text-center cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all"
+        >
+          <div className="text-4xl mb-3">🎓</div>
+          <h3 className="font-bold text-lg text-blue-800 mb-1">Skripsi & Jurnal</h3>
+          <p className="text-gray-500 text-sm">Koleksi skripsi dan jurnal mahasiswa</p>
         </div>
 
         <div
