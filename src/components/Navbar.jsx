@@ -39,6 +39,7 @@ function Navbar() {
             <>
             <Link to="/anggota" className="hover:text-yellow-300">Anggota</Link>
               <Link to="/admin/buku" className="hover:text-yellow-300">Admin</Link>
+              <Link to="/admin/skripsi-jurnal" className="hover:text-yellow-300">Admin Skripsi</Link>
               <button
                 onClick={handleLogout}
                 className="bg-red-500 hover:bg-red-600 px-3 py-1 rounded-lg text-white text-sm transition"
