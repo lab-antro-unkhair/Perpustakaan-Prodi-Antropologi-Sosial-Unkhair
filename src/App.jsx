@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import Home from './pages/Home'
 import Katalog from './pages/Katalog'
+import SkripsiJurnal from './pages/SkripsiJurnal'
 import Peminjaman from './pages/Peminjaman'
 import Login from './pages/Login'
 import AdminBuku from './pages/AdminBuku'
@@ -14,6 +15,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/katalog" element={<Katalog />} />
+        <Route path="/skripsi-jurnal" element={<SkripsiJurnal />} />
         <Route path="/peminjaman" element={<Peminjaman />} />
         <Route path="/login" element={<Login />} />
         <Route path="/admin/buku" element={<AdminBuku />} />

@@ -33,6 +33,7 @@ function Navbar() {
         <div className="flex gap-4 text-sm items-center">
           <Link to="/" className="hover:text-yellow-300">Beranda</Link>
           <Link to="/katalog" className="hover:text-yellow-300">Katalog</Link>
+          <Link to="/skripsi-jurnal" className="hover:text-yellow-300">Skripsi & Jurnal</Link>
           <Link to="/peminjaman" className="hover:text-yellow-300">Peminjaman</Link>
           {user ? (
             <>
