@@ -84,7 +84,12 @@ function SkripsiJurnal() {
                 </span>
                 <h3 className="font-bold text-blue-800 mt-2 mb-1">{item.judul}</h3>
                 <p className="text-gray-600 text-sm mb-1">✍️ {item.nama}</p>
-                <p className="text-gray-400 text-xs">{item.prodi}</p>
+                <p className="text-gray-400 text-xs mb-2">{item.prodi}</p>
+                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                  item.stok > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                  }`}>
+                  {item.stok > 0 ? `Tersedia (${item.stok})` : 'Tidak Tersedia'}
+                </span>
               </div>
               <div className="text-gray-400 text-sm font-medium">#{item.no}</div>
             </div>

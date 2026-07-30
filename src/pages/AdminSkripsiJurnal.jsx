@@ -9,7 +9,7 @@ function AdminSkripsiJurnal() {
   const [showForm, setShowForm] = useState(false)
   const [editId, setEditId] = useState(null)
   const [editForm, setEditForm] = useState({})
-  const [form, setForm] = useState({ no: '', nama: '', tipe: 'SKRIPSI DAN JURNAL', judul: '', prodi: '' })
+  const [form, setForm] = useState({ no: '', nama: '', tipe: 'SKRIPSI DAN JURNAL', judul: '', prodi: '', stok: 1 })
   const scrollRef = useRef(0)
   const navigate = useNavigate()
 
@@ -67,7 +67,7 @@ function AdminSkripsiJurnal() {
 
   function handleEdit(item) {
     setEditId(item.id)
-    setEditForm({ no: item.no, nama: item.nama, tipe: item.tipe, judul: item.judul, prodi: item.prodi })
+    setEditForm({ no: item.no, nama: item.nama, tipe: item.tipe, judul: item.judul, prodi: item.prodi, stok: item.stok })
   }
 
   const filtered = dataList.filter(d =>
@@ -107,6 +107,9 @@ function AdminSkripsiJurnal() {
             <input placeholder="Program Studi" value={form.prodi}
               onChange={e => setForm({ ...form, prodi: e.target.value })}
               className="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <input type="number" placeholder="Stok" value={form.stok}
+              onChange={e => setForm({ ...form, stok: parseInt(e.target.value) })}
+              className="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
             <textarea placeholder="Judul *" value={form.judul}
               onChange={e => setForm({ ...form, judul: e.target.value })}
               rows={3}
@@ -138,7 +141,8 @@ function AdminSkripsiJurnal() {
               <th className="px-4 py-3 text-left">No</th>
               <th className="px-4 py-3 text-left">Nama</th>
               <th className="px-4 py-3 text-left">Judul</th>
-              <th className="px-4 py-3 text-left">Tipe</th>
+              <th className="px-4 py-3 text-center">Tipe</th>
+              <th className="px-4 py-3 text-left">Stok</th>
               <th className="px-4 py-3 text-left">Aksi</th>
             </tr>
           </thead>
@@ -151,10 +155,15 @@ function AdminSkripsiJurnal() {
                   <td className="px-4 py-3">{item.no}</td>
                   <td className="px-4 py-3">{item.nama}</td>
                   <td className="px-4 py-3">{item.judul}</td>
+                  <td className="px-4 py-3 text-center">
+                    <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700 text-center block">
+                      {item.tipe === 'SKRIPSI DAN JURNAL' ? 'Skripsi & Jurnal' : item.tipe === 'SKRIPSI' ? 'Skripsi' : 'Jurnal'}
+                  </span>
+                  </td>
                   <td className="px-4 py-3">
-                    <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
-                      {item.tipe}
-                    </span>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${item.stok > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                      {item.stok}
+                  </span>
                   </td>
                   <td className="px-4 py-3 flex gap-2">
                     <button onClick={() => editId === item.id ? setEditId(null) : handleEdit(item)}
@@ -200,6 +209,12 @@ function AdminSkripsiJurnal() {
                             onChange={e => setEditForm({ ...editForm, prodi: e.target.value })}
                             className="w-full border border-blue-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
                         </div>
+                        <div>
+                          <label className="text-xs text-gray-500 mb-1 block">Stok</label>
+                          <input type="number" value={editForm.stok}
+                            onChange={e => setEditForm({ ...editForm, stok: parseInt(e.target.value) })}
+                            className="w-full border border-blue-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                          </div>
                         <div className="md:col-span-2">
                           <label className="text-xs text-gray-500 mb-1 block">Judul *</label>
                           <textarea value={editForm.judul}

@@ -5,6 +5,8 @@ function Peminjaman() {
   const [dataPeminjaman, setDataPeminjaman] = useState([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
+  const [searchBuku, setSearchBuku] = useState('')
+  const [showDropdown, setShowDropdown] = useState(false)
   const [user, setUser] = useState(null)
   const [form, setForm] = useState({
     nama_anggota: '',
@@ -39,11 +41,20 @@ function Peminjaman() {
   }
 
   async function fetchBuku() {
-    const { data } = await supabase
+    const { data: buku } = await supabase
       .from('buku')
       .select('id, no_induk, judul')
       .order('no_induk')
-    setBukuList(data || [])
+  
+    const { data: skripsi } = await supabase
+      .from('skripsi_jurnal')
+      .select('id, no, judul')
+      .order('no')
+
+    const bukuFormatted = (buku || []).map(b => ({ id: `buku-${b.id}`, judul: b.judul, label: `[Buku] ${b.no_induk} - ${b.judul}` }))
+    const skripsiFormatted = (skripsi || []).map(s => ({ id: `skripsi-${s.id}`, judul: s.judul, label: `[Skripsi/Jurnal] ${s.no} - ${s.judul}` }))
+  
+    setBukuList([...bukuFormatted, ...skripsiFormatted])
   }
 
   async function handleSimpan() {
@@ -68,11 +79,11 @@ function Peminjaman() {
     fetchPeminjaman()
   }
 
-  function handlePilihBuku(e) {
-    const selected = bukuList.find(b => b.id === parseInt(e.target.value))
+function handlePilihBuku(e) {
+  const selected = bukuList.find(b => b.id === e.target.value)
     if (selected) {
-      setForm({ ...form, id_buku: selected.id, judul_buku: selected.judul })
-    }
+    setForm({ ...form, id_buku: selected.id, judul_buku: selected.judul })
+  }
   }
 
   return (
@@ -100,13 +111,38 @@ function Peminjaman() {
             <input placeholder="NPM" value={form.npm}
               onChange={e => setForm({ ...form, npm: e.target.value })}
               className="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
-            <select onChange={handlePilihBuku}
-              className="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <option value="">-- Pilih Buku --</option>
-              {bukuList.map(b => (
-                <option key={b.id} value={b.id}>{b.no_induk} - {b.judul}</option>
-              ))}
-            </select>
+            <div className="relative">
+            <input
+              type="text"
+              placeholder="Cari dan pilih buku/skripsi/jurnal..."
+              value={searchBuku}
+              onChange={e => { setSearchBuku(e.target.value); setShowDropdown(true) }}
+              onFocus={() => setShowDropdown(true)}
+              className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              {showDropdown && searchBuku && (
+            <div className="absolute z-10 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto mt-1">
+              {bukuList
+                .filter(b => b.label.toLowerCase().includes(searchBuku.toLowerCase()))
+                .slice(0, 20)
+                .map(b => (
+            <div key={b.id}
+              onClick={() => {
+                setForm({ ...form, id_buku: b.id, judul_buku: b.judul })
+                setSearchBuku(b.label)
+                setShowDropdown(false)
+                }}
+              className="px-4 py-2 text-sm hover:bg-blue-50 cursor-pointer border-b last:border-0">
+                {b.label}
+            </div>
+              ))
+              }
+              {bukuList.filter(b => b.label.toLowerCase().includes(searchBuku.toLowerCase())).length === 0 && (
+            <div className="px-4 py-2 text-sm text-gray-400">Tidak ditemukan</div>
+              )}
+            </div>
+              )}
+            </div>
             <input placeholder="Judul Buku (otomatis terisi)" value={form.judul_buku} readOnly
               className="border border-gray-200 bg-gray-50 rounded-lg px-4 py-2 text-sm text-gray-500" />
             <div>
