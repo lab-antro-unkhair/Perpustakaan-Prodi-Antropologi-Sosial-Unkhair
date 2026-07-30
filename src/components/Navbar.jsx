@@ -32,7 +32,7 @@ function Navbar() {
         <h1 className="font-bold text-sm md:text-base flex items-center gap-2">
           <img src="/logo.png" alt="logo" className="h-8 w-8 object-contain" />
           <span className="hidden sm:block">Perpustakaan Prodi Antropologi Sosial UNKHAIR</span>
-          <span className="block sm:hidden">Perpus Antsos UNKHAIR</span>
+          <span className="block sm:hidden">Perpus Antropos UNKHAIR</span>
         </h1>
 
         {/* Hamburger button - mobile only */}
