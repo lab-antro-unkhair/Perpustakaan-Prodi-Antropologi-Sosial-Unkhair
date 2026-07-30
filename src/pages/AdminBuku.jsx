@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { supabase } from '../supabaseClient'
 import { useNavigate } from 'react-router-dom'
+import Toast from '../components/Toast'
+import { useToast } from '../hooks/useToast'
 
 function AdminBuku() {
   const [bukuList, setBukuList] = useState([])
@@ -11,6 +13,7 @@ function AdminBuku() {
   const [editForm, setEditForm] = useState({})
   const [form, setForm] = useState({ no_induk: '', judul: '', pengarang: '', penerbit: '', stok: 1 })
   const [coverFile, setCoverFile] = useState(null)
+  const { toast, showToast } = useToast()
   const scrollRef = useRef(0)
   const navigate = useNavigate()
 
@@ -50,6 +53,7 @@ function AdminBuku() {
     await supabase.from('buku').insert(form)
     setForm({ no_induk: '', judul: '', pengarang: '', penerbit: '', stok: 1 })
     setShowForm(false)
+    showToast('Data berhasil disimpan!')
     fetchBuku()
   }
 
@@ -77,12 +81,14 @@ function AdminBuku() {
     await supabase.from('buku').update(updatedForm).eq('id', id)
     setEditId(null)
     setCoverFile(null)
+    showToast('Data berhasil diperbarui!')
     fetchBuku()
   }
 
   async function handleHapus(id) {
     if (!confirm('Yakin hapus buku ini?')) return
     await supabase.from('buku').delete().eq('id', id)
+    showToast('Data berhasil dihapus!', 'error')
     fetchBuku()
   }
 
@@ -248,6 +254,7 @@ function AdminBuku() {
           </tbody>
         </table>
       </div>
+      {toast && <Toast message={toast.message} type={toast.type} />}
     </div>
   )
 }

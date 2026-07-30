@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { supabase } from '../supabaseClient'
 import { useNavigate } from 'react-router-dom'
+import Toast from '../components/Toast'
+import { useToast } from '../hooks/useToast'
 
 function AdminSkripsiJurnal() {
   const [dataList, setDataList] = useState([])
@@ -9,6 +11,7 @@ function AdminSkripsiJurnal() {
   const [showForm, setShowForm] = useState(false)
   const [editId, setEditId] = useState(null)
   const [editForm, setEditForm] = useState({})
+  const { toast, showToast } = useToast()
   const [form, setForm] = useState({ no: '', nama: '', tipe: 'SKRIPSI DAN JURNAL', judul: '', prodi: '', stok: 1 })
   const scrollRef = useRef(0)
   const navigate = useNavigate()
@@ -49,6 +52,7 @@ function AdminSkripsiJurnal() {
     await supabase.from('skripsi_jurnal').insert(form)
     setForm({ no: '', nama: '', tipe: 'SKRIPSI DAN JURNAL', judul: '', prodi: '' })
     setShowForm(false)
+    showToast('Data berhasil disimpan!')
     fetchData()
   }
 
@@ -56,12 +60,14 @@ function AdminSkripsiJurnal() {
     if (!editForm.judul || !editForm.nama) return alert('Judul dan nama wajib diisi!')
     await supabase.from('skripsi_jurnal').update(editForm).eq('id', id)
     setEditId(null)
+    showToast('Data berhasil diperbarui!')
     fetchData()
   }
 
   async function handleHapus(id) {
     if (!confirm('Yakin hapus data ini?')) return
     await supabase.from('skripsi_jurnal').delete().eq('id', id)
+    showToast('Data berhasil dihapus!', 'error')
     fetchData()
   }
 
@@ -241,6 +247,7 @@ function AdminSkripsiJurnal() {
           </tbody>
         </table>
       </div>
+      {toast && <Toast message={toast.message} type={toast.type} />}
     </div>
   )
 }

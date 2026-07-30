@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../supabaseClient'
+import Toast from '../components/Toast'
+import { useToast } from '../hooks/useToast'
 
 function Anggota() {
   const [anggotaList, setAnggotaList] = useState([])
@@ -7,6 +9,7 @@ function Anggota() {
   const [search, setSearch] = useState('')
   const [showForm, setShowForm] = useState(false)
   const [editData, setEditData] = useState(null)
+  const { toast, showToast } = useToast()
   const [user, setUser] = useState(null)
   const [form, setForm] = useState({
     nama: '', npm: '', angkatan: '', no_hp: '', email: ''
@@ -44,12 +47,14 @@ function Anggota() {
     setForm({ nama: '', npm: '', angkatan: '', no_hp: '', email: '' })
     setEditData(null)
     setShowForm(false)
+    showToast('Data berhasil disimpan!')
     fetchAnggota()
   }
 
   async function handleHapus(id) {
     if (!confirm('Yakin hapus anggota ini?')) return
     await supabase.from('anggota').delete().eq('id', id)
+    showToast('Data berhasil dihapus!', 'error')
     fetchAnggota()
   }
 
@@ -57,6 +62,7 @@ function Anggota() {
     setEditData(anggota)
     setForm({ nama: anggota.nama, npm: anggota.npm, angkatan: anggota.angkatan, no_hp: anggota.no_hp, email: anggota.email })
     setShowForm(true)
+    showToast('Data berhasil diperbarui!')
   }
 
   const filtered = anggotaList.filter(a =>
@@ -163,6 +169,7 @@ function Anggota() {
           </tbody>
         </table>
       </div>
+      {toast && <Toast message={toast.message} type={toast.type} />}
     </div>
   )
 }

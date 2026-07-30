@@ -70,6 +70,7 @@ function Peminjaman() {
   async function handleKembali(id) {
     if (!confirm('Tandai buku ini sudah dikembalikan?')) return
     await supabase.from('peminjaman').update({ status: 'Dikembalikan' }).eq('id', id)
+    showToast('Buku berhasil dikembalikan!')
     fetchPeminjaman()
   }
 
