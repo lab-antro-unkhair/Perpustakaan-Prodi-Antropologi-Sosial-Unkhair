@@ -37,13 +37,11 @@ function Anggota() {
 
   async function handleSimpan() {
     if (!form.nama || !form.npm) return alert('Nama dan NPM wajib diisi!')
-
     if (editData) {
       await supabase.from('anggota').update(form).eq('id', editData.id)
     } else {
       await supabase.from('anggota').insert(form)
     }
-
     setForm({ nama: '', npm: '', angkatan: '', no_hp: '', email: '' })
     setEditData(null)
     setShowForm(false)
@@ -62,7 +60,6 @@ function Anggota() {
     setEditData(anggota)
     setForm({ nama: anggota.nama, npm: anggota.npm, angkatan: anggota.angkatan, no_hp: anggota.no_hp, email: anggota.email })
     setShowForm(true)
-    showToast('Data berhasil diperbarui!')
   }
 
   const filtered = anggotaList.filter(a =>
@@ -70,6 +67,19 @@ function Anggota() {
     a.npm?.toLowerCase().includes(search.toLowerCase()) ||
     a.angkatan?.toLowerCase().includes(search.toLowerCase())
   )
+
+  if (!user && !loading) {
+    return (
+      <div className="max-w-6xl mx-auto px-6 py-20 text-center">
+        <div className="text-5xl mb-4">🔒</div>
+        <h2 className="text-2xl font-bold text-blue-800 mb-2">Akses Terbatas</h2>
+        <p className="text-gray-500 mb-6">Halaman ini hanya bisa diakses oleh admin yang sudah login.</p>
+        <a href="/login" className="bg-blue-800 text-white px-6 py-2 rounded-lg text-sm hover:bg-blue-700 transition">
+          Login Sekarang
+        </a>
+      </div>
+    )
+  }
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-10">
@@ -85,7 +95,6 @@ function Anggota() {
         )}
       </div>
 
-      {/* Form tambah/edit */}
       {showForm && (
         <div className="bg-white rounded-xl shadow p-6 mb-6">
           <h3 className="font-bold text-blue-800 mb-4">{editData ? 'Edit Anggota' : 'Tambah Anggota Baru'}</h3>
@@ -119,7 +128,6 @@ function Anggota() {
         </div>
       )}
 
-      {/* Search */}
       <div className="mb-4 flex gap-3 items-center">
         <input type="text" placeholder="Cari nama, NPM, atau angkatan..."
           value={search} onChange={e => setSearch(e.target.value)}
@@ -127,7 +135,6 @@ function Anggota() {
         <span className="text-gray-400 text-sm">{filtered.length} anggota</span>
       </div>
 
-      {/* Tabel */}
       <div className="bg-white rounded-xl shadow overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-blue-800 text-white">
@@ -137,7 +144,7 @@ function Anggota() {
               <th className="px-4 py-3 text-left">Angkatan</th>
               <th className="px-4 py-3 text-left">No. HP</th>
               <th className="px-4 py-3 text-left">Email</th>
-              {user && <th className="px-4 py-3 text-left">Aksi</th>}
+              <th className="px-4 py-3 text-left">Aksi</th>
             </tr>
           </thead>
           <tbody>
@@ -152,18 +159,16 @@ function Anggota() {
                 <td className="px-4 py-3">{anggota.angkatan}</td>
                 <td className="px-4 py-3">{anggota.no_hp}</td>
                 <td className="px-4 py-3">{anggota.email}</td>
-                {user && (
-                  <td className="px-4 py-3 flex gap-2">
-                    <button onClick={() => handleEdit(anggota)}
-                      className="bg-yellow-400 hover:bg-yellow-500 text-white px-3 py-1 rounded text-xs transition">
-                      Edit
-                    </button>
-                    <button onClick={() => handleHapus(anggota.id)}
-                      className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs transition">
-                      Hapus
-                    </button>
-                  </td>
-                )}
+                <td className="px-4 py-3 flex gap-2">
+                  <button onClick={() => handleEdit(anggota)}
+                    className="bg-yellow-400 hover:bg-yellow-500 text-white px-3 py-1 rounded text-xs transition">
+                    Edit
+                  </button>
+                  <button onClick={() => handleHapus(anggota.id)}
+                    className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs transition">
+                    Hapus
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
