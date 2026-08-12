@@ -3,6 +3,7 @@ import { supabase } from '../supabaseClient'
 import { useNavigate } from 'react-router-dom'
 import Toast from '../components/Toast'
 import { useToast } from '../hooks/useToast'
+import * as XLSX from 'xlsx'
 
 function AdminBuku() {
   const [bukuList, setBukuList] = useState([])
@@ -91,7 +92,20 @@ function AdminBuku() {
     showToast('Data berhasil dihapus!', 'error')
     fetchBuku()
   }
+  function handleExport() {
+  const exportData = bukuList.map(b => ({
+    'No. Induk': b.no_induk,
+    'Judul': b.judul,
+    'Pengarang': b.pengarang,
+    'Penerbit': b.penerbit,
+    'Stok': b.stok
+  }))
 
+  const ws = XLSX.utils.json_to_sheet(exportData)
+  const wb = XLSX.utils.book_new()
+  XLSX.utils.book_append_sheet(wb, ws, 'Katalog Buku')
+  XLSX.writeFile(wb, 'katalog_buku.xlsx')
+}
   function handleEdit(buku) {
     setEditId(buku.id)
     setEditForm({ no_induk: buku.no_induk, judul: buku.judul, pengarang: buku.pengarang, penerbit: buku.penerbit, stok: buku.stok, cover_url: buku.cover_url })
@@ -106,12 +120,20 @@ function AdminBuku() {
     <div className="max-w-6xl mx-auto px-6 py-10">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-blue-800">Kelola Buku</h2>
-        <button
-          onClick={() => { setShowForm(true); setEditId(null) }}
-          className="bg-blue-800 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition"
-        >
-          + Tambah Buku
-        </button>
+        <div className="flex gap-3">
+          <button
+            onClick={handleExport}
+            className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700 transition"
+          >
+            ⬇ Download Excel
+          </button>
+          <button
+            onClick={() => { setShowForm(true); setEditId(null) }}
+            className="bg-blue-800 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition"
+          >
+            + Tambah Buku
+          </button>
+        </div>
       </div>
 
       {showForm && (

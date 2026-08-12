@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../supabaseClient'
 import Toast from '../components/Toast'
 import { useToast } from '../hooks/useToast'
+import * as XLSX from 'xlsx'
 
 function Anggota() {
   const [anggotaList, setAnggotaList] = useState([])
@@ -55,6 +56,20 @@ function Anggota() {
     showToast('Data berhasil dihapus!', 'error')
     fetchAnggota()
   }
+  function handleExport() {
+  const exportData = anggotaList.map(a => ({
+    'Nama': a.nama,
+    'NPM': a.npm,
+    'Angkatan': a.angkatan,
+    'No. HP': a.no_hp,
+    'Email': a.email
+  }))
+
+  const ws = XLSX.utils.json_to_sheet(exportData)
+  const wb = XLSX.utils.book_new()
+  XLSX.utils.book_append_sheet(wb, ws, 'Data Anggota')
+  XLSX.writeFile(wb, 'data_anggota.xlsx')
+  }
 
   function handleEdit(anggota) {
     setEditData(anggota)
@@ -86,12 +101,20 @@ function Anggota() {
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-blue-800">Data Anggota</h2>
         {user && (
+          <div className="flex gap-3">
           <button
-            onClick={() => { setShowForm(true); setEditData(null); setForm({ nama: '', npm: '', angkatan: '', no_hp: '', email: '' }) }}
-            className="bg-blue-800 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition"
-          >
-            + Tambah Anggota
+              onClick={handleExport}
+              className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700 transition"
+  >
+          ⬇ Download Excel
           </button>
+          <button
+              onClick={() => { setShowForm(true); setEditData(null); setForm({ nama: '', npm: '', angkatan: '', no_hp: '', email: '' }) }}
+              className="bg-blue-800 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition"
+          >
+          + Tambah Anggota
+          </button>
+          </div>
         )}
       </div>
 

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../supabaseClient'
 import Toast from '../components/Toast'
 import { useToast } from '../hooks/useToast'
+import * as XLSX from 'xlsx'
 
 function Peminjaman() {
   const [dataPeminjaman, setDataPeminjaman] = useState([])
@@ -96,6 +97,21 @@ function Peminjaman() {
     showToast('Data berhasil dihapus!', 'error')
     fetchPeminjaman()
   }
+function handleExport() {
+  const exportData = dataPeminjaman.map(d => ({
+    'Nama Anggota': d.nama_anggota,
+    'NPM': d.npm,
+    'Judul Buku': d.judul_buku,
+    'Tanggal Pinjam': d.tanggal_pinjam,
+    'Tanggal Kembali': d.tanggal_kembali,
+    'Status': d.status
+  }))
+
+  const ws = XLSX.utils.json_to_sheet(exportData)
+  const wb = XLSX.utils.book_new()
+  XLSX.utils.book_append_sheet(wb, ws, 'Data Peminjaman')
+  XLSX.writeFile(wb, 'data_peminjaman.xlsx')
+  }
 
 function handlePilihBuku(e) {
   const selected = bukuList.find(b => b.id === e.target.value)
@@ -109,12 +125,20 @@ function handlePilihBuku(e) {
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-blue-800">Data Peminjaman</h2>
         {user && (
-          <button
-            onClick={() => setShowForm(true)}
-            className="bg-blue-800 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition"
-          >
-            + Tambah Peminjaman
-          </button>
+          <div className="flex gap-3">
+      <button
+        onClick={handleExport}
+        className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700 transition"
+  >
+      ⬇ Download Excel
+      </button>
+      <button
+        onClick={() => setShowForm(true)}
+        className="bg-blue-800 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition"
+  >
+      + Tambah Peminjaman
+      </button>
+      </div>
         )}
       </div>
 
