@@ -78,8 +78,11 @@ function Katalog() {
     <div className="w-full h-48 bg-gray-100 rounded-lg mb-3 flex items-center justify-center text-4xl">
       📖
     </div>
-  )}
-  <h3 className="font-bold text-blue-800 mb-1">{buku.judul}</h3>
+      )}
+    <div className="flex items-center justify-between mb-1">
+      <h3 className="font-bold text-blue-800">{buku.judul}</h3>
+      <span className="text-gray-500 text-base font-bold">#{buku.no_induk}</span>
+    </div>
               <p className="text-gray-500 text-sm mb-1">{buku.pengarang}</p>
               <p className="text-gray-400 text-xs mb-3">{buku.penerbit}</p>
               <span className={`px-2 py-1 rounded-full text-xs font-medium ${
