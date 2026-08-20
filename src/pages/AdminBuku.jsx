@@ -14,6 +14,8 @@ function AdminBuku() {
   const [editForm, setEditForm] = useState({})
   const [form, setForm] = useState({ no_induk: '', judul: '', pengarang: '', penerbit: '', stok: 1 })
   const [coverFile, setCoverFile] = useState(null)
+  const [selected, setSelected] = useState([])
+  const [bulkAction, setBulkAction] = useState('')
   const { toast, showToast } = useToast()
   const scrollRef = useRef(0)
   const navigate = useNavigate()
@@ -90,6 +92,25 @@ function AdminBuku() {
   showToast(currentStatus ? 'Buku disembunyikan!' : 'Buku ditampilkan!', currentStatus ? 'error' : 'success')
   fetchBuku()
   }
+  async function handleBulkAction() {
+  if (!bulkAction) return alert('Pilih aksi dulu!')
+  if (selected.length === 0) return alert('Pilih buku dulu!')
+
+  const isVisible = bulkAction === 'tampil'
+  await supabase.from('buku').update({ is_visible: isVisible }).in('id', selected)
+  showToast(isVisible ? `${selected.length} buku ditampilkan!` : `${selected.length} buku disembunyikan!`, isVisible ? 'success' : 'error')
+  setSelected([])
+  setBulkAction('')
+  fetchBuku()
+  }
+
+  function handleSelectAll() {
+    if (selected.length === filtered.length) {
+    setSelected([])
+    } else {
+    setSelected(filtered.map(b => b.id))
+    }
+    }
 
   async function handleHapus(id) {
     if (!confirm('Yakin hapus buku ini?')) return
@@ -180,10 +201,43 @@ function AdminBuku() {
           className="w-full md:w-1/2 border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
       </div>
 
+      {/* Bulk action toolbar */}
+      <div className="mb-4 flex gap-3 items-center">
+      <select
+          value={bulkAction}
+          onChange={e => setBulkAction(e.target.value)}
+          className="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+      >
+      <option value="">-- Pilih Aksi --</option>
+      <option value="tampil">👁 Tampilkan</option>
+      <option value="hidden">🙈 Sembunyikan</option>
+    </select>
+    <button
+            onClick={handleBulkAction}
+            className="bg-blue-800 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition"
+            >
+            Terapkan ({selected.length} dipilih)
+  </button>
+            {selected.length > 0 && (
+    <button
+      onClick={() => setSelected([])}
+      className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-300 transition"
+      >
+      Batal Pilih
+    </button>
+    )}
+  `</div>
       <div className="bg-white rounded-xl shadow overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-blue-800 text-white">
             <tr>
+              <th className="px-4 py-3">
+          <input type="checkbox"
+                checked={selected.length === filtered.length && filtered.length > 0}
+                onChange={handleSelectAll}
+                className="cursor-pointer"
+          />
+          </th>
               <th className="px-4 py-3 text-left">No. Induk</th>
               <th className="px-4 py-3 text-left">Judul</th>
               <th className="px-4 py-3 text-left">Pengarang</th>
@@ -198,7 +252,16 @@ function AdminBuku() {
               <tr><td colSpan="6" className="text-center py-10 text-gray-400">Memuat data...</td></tr>
             ) : filtered.map(buku => (
               <React.Fragment key={buku.id}>
-                <tr className={`border-b hover:bg-gray-50 ${editId === buku.id ? 'bg-blue-50' : ''}`}>
+                <tr className={`border-b hover:bg-gray-50 ${editId === buku.id ? 'bg-blue-50' : ''} ${selected.includes(buku.id) ? 'bg-blue-50' : ''}`}>
+  <td className="px-4 py-3">
+    <input type="checkbox"
+      checked={selected.includes(buku.id)}
+      onChange={() => setSelected(prev =>
+        prev.includes(buku.id) ? prev.filter(id => id !== buku.id) : [...prev, buku.id]
+      )}
+      className="cursor-pointer"
+      />
+      </td>
                   <td className="px-4 py-3">{buku.no_induk}</td>
                   <td className="px-4 py-3">{buku.judul}</td>
                   <td className="px-4 py-3">{buku.pengarang}</td>
@@ -233,7 +296,7 @@ function AdminBuku() {
 
                 {editId === buku.id && (
                   <tr id={`edit-row-${buku.id}`}>
-                    <td colSpan="6" className="px-4 py-4 bg-blue-50 border-b-2 border-blue-300">
+                    <td colSpan="7" className="px-4 py-4 bg-blue-50 border-b-2 border-blue-300">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div>
                           <label className="text-xs text-gray-500 mb-1 block">No. Induk</label>
