@@ -85,6 +85,11 @@ function AdminBuku() {
     showToast('Data berhasil diperbarui!')
     fetchBuku()
   }
+  async function handleToggleVisible(id, currentStatus) {
+  await supabase.from('buku').update({ is_visible: !currentStatus }).eq('id', id)
+  showToast(currentStatus ? 'Buku disembunyikan!' : 'Buku ditampilkan!', currentStatus ? 'error' : 'success')
+  fetchBuku()
+  }
 
   async function handleHapus(id) {
     if (!confirm('Yakin hapus buku ini?')) return
@@ -184,6 +189,7 @@ function AdminBuku() {
               <th className="px-4 py-3 text-left">Pengarang</th>
               <th className="px-4 py-3 text-left">Penerbit</th>
               <th className="px-4 py-3 text-left">Stok</th>
+              <th className="px-4 py-3 text-left">Status</th>
               <th className="px-4 py-3 text-left">Aksi</th>
             </tr>
           </thead>
@@ -201,6 +207,17 @@ function AdminBuku() {
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${buku.stok > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                       {buku.stok}
                     </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <button
+                      onClick={() => handleToggleVisible(buku.id, buku.is_visible)}
+                      className={`px-2 py-1 rounded-full text-xs font-medium transition ${
+                      buku.is_visible
+                      ? 'bg-green-100 text-green-700 hover:bg-red-100 hover:text-red-700'
+                      : 'bg-red-100 text-red-700 hover:bg-green-100 hover:text-green-700'
+                      }`}>
+                      {buku.is_visible ? '👁 Tampil' : '🙈 Hidden'}
+                    </button>
                   </td>
                   <td className="px-4 py-3 flex gap-2">
                     <button onClick={() => editId === buku.id ? setEditId(null) : handleEdit(buku)}

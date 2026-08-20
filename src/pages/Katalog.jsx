@@ -18,18 +18,20 @@ function Katalog() {
     setLoading(true)
 
     let query = supabase
-      .from('buku')
-      .select('*', { count: 'exact' })
-      .order('no_induk', { ascending: true })
-      .range((page - 1) * PER_PAGE, page * PER_PAGE - 1)
+  .from('buku')
+  .select('*', { count: 'exact' })
+  .eq('is_visible', true)
+  .order('no_induk', { ascending: true })
+  .range((page - 1) * PER_PAGE, page * PER_PAGE - 1)
 
     if (search) {
       query = supabase
-        .from('buku')
-        .select('*', { count: 'exact' })
-        .or(`judul.ilike.%${search}%,pengarang.ilike.%${search}%`)
-        .order('no_induk', { ascending: true })
-        .range((page - 1) * PER_PAGE, page * PER_PAGE - 1)
+  .from('buku')
+  .select('*', { count: 'exact' })
+  .eq('is_visible', true)
+  .or(`judul.ilike.%${search}%,pengarang.ilike.%${search}%`)
+  .order('no_induk', { ascending: true })
+  .range((page - 1) * PER_PAGE, page * PER_PAGE - 1)
     }
 
     const { data, count, error } = await query
