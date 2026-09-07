@@ -74,22 +74,69 @@ function Peminjaman() {
 }
 
   async function handleSimpan() {
-    if (!form.nama_anggota || !form.judul_buku || !form.tanggal_pinjam || !form.tanggal_kembali)
-      return alert('Semua field wajib diisi!')
+  if (!form.nama_anggota || !form.judul_buku || !form.tanggal_pinjam || !form.tanggal_kembali)
+    return alert('Semua field wajib diisi!')
 
-    await supabase.from('peminjaman').insert(form)
-    setForm({ nama_anggota: '', npm: '', id_buku: '', judul_buku: '', tanggal_pinjam: '', tanggal_kembali: '', status: 'Dipinjam' })
-    setShowForm(false)
-    showToast('Data berhasil disimpan!')
-    fetchPeminjaman()
+  // Simpan data peminjaman
+  await supabase.from('peminjaman').insert(form)
+
+  // Kurangi stok buku (hanya jika yang dipinjam adalah buku, bukan skripsi/jurnal)
+  if (form.id_buku.startsWith('buku-')) {
+    const bukuId = form.id_buku.replace('buku-', '')
+
+    const { data: bukuData } = await supabase
+      .from('buku')
+      .select('stok')
+      .eq('id', bukuId)
+      .single()
+
+    if (bukuData && bukuData.stok > 0) {
+      await supabase
+        .from('buku')
+        .update({ stok: bukuData.stok - 1 })
+        .eq('id', bukuId)
+    }
   }
 
-  async function handleKembali(id) {
-    if (!confirm('Tandai buku ini sudah dikembalikan?')) return
-    await supabase.from('peminjaman').update({ status: 'Dikembalikan' }).eq('id', id)
-    showToast('Buku berhasil dikembalikan!')
-    fetchPeminjaman()
+  setForm({ nama_anggota: '', npm: '', id_buku: '', judul_buku: '', tanggal_pinjam: '', tanggal_kembali: '', status: 'Dipinjam' })
+  setShowForm(false)
+  showToast('Data berhasil disimpan!')
+  fetchPeminjaman()
+}
+
+async function handleKembali(id) {
+  if (!confirm('Tandai buku ini sudah dikembalikan?')) return
+
+  // Ambil dulu data peminjamannya, buat tau id_buku yang mau dikembalikan
+  const { data: peminjamanData } = await supabase
+    .from('peminjaman')
+    .select('id_buku')
+    .eq('id', id)
+    .single()
+
+  await supabase.from('peminjaman').update({ status: 'Dikembalikan' }).eq('id', id)
+
+  // Tambah lagi stok buku (hanya jika bukunya, bukan skripsi/jurnal)
+  if (peminjamanData?.id_buku?.startsWith('buku-')) {
+    const bukuId = peminjamanData.id_buku.replace('buku-', '')
+
+    const { data: bukuData } = await supabase
+      .from('buku')
+      .select('stok')
+      .eq('id', bukuId)
+      .single()
+
+    if (bukuData) {
+      await supabase
+        .from('buku')
+        .update({ stok: bukuData.stok + 1 })
+        .eq('id', bukuId)
+    }
   }
+
+  showToast('Buku berhasil dikembalikan!')
+  fetchPeminjaman()
+}
 
   async function handleHapus(id) {
     if (!confirm('Hapus data peminjaman ini?')) return
